@@ -55,4 +55,11 @@ public class Combatant {
         }
     }
 
+    public String printStats()
+    {
+        string stats = combatantName + "\n" + fightAttribute  + "\n" + fightSkill + "\n" + stress.Length
+            + "\n" + (consequences.Length-1)*2 + "\n" + attackBonus + "\n" + defenseBonus + "\n" + armorValue + "\n" + weaponDamage;
+        return stats;
+    }
+
 }

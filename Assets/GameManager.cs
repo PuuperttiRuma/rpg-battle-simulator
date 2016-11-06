@@ -7,6 +7,7 @@ using System.Collections.Generic;
 public class GameManager : MonoBehaviour {
 
     public Text resultsText;
+    public Text statsText;
     public GameObject popupMenu;
 
     List<Combatant> combatants = new List<Combatant>();
@@ -30,6 +31,7 @@ public class GameManager : MonoBehaviour {
     {
         combatants.Add(new Combatant(newCombatant));
         popupMenu.SetActive(false);
+        showStats();
     }
 
     public void rollDie(int amount)
@@ -49,6 +51,11 @@ public class GameManager : MonoBehaviour {
             sum += array[i];
         }
         return sum;
+    }
+
+    void showStats()
+    {
+        statsText.text = combatants[0].printStats();
     }
 
     void showResults()
