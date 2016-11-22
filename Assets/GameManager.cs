@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour {
     public Text resultsText;
     public Text statsText;
     public GameObject popupMenu;
+    public Scrollbar scrollbar;
 
     List<Combatant> combatants = new List<Combatant>();
     CharacterCreator characterCreator;
@@ -25,8 +26,8 @@ public class GameManager : MonoBehaviour {
 
     private void debugCombatants()
     {
-        combatants.Add(new Combatant("Allie", 3, 4, 8, 2));
-        combatants.Add(new Combatant("Bellie", 3, 4, 8, 2));
+        combatants.Add(new Combatant("Annie", 3, 4, 8, 2));
+        combatants.Add(new Combatant("Belle", 3, 4, 8, 2));
         activeCombatant = combatants[0];
         showStats();
     }
@@ -72,13 +73,16 @@ public class GameManager : MonoBehaviour {
         Combatant attacker = activeCombatant;
         Combatant defender = activeCombatant.attackTarget;
         int toHit = attacker.attack();
-        resultsText.text += attacker.name + " rolls " + toHit + " for attack.\n";
         int defence = defender.defend();
-        resultsText.text += defender.name + " rolls " + defence + " for defence.\n";
+
         //TODO defender käyttää bonuksen vain jos on tulossa osuma
         int result = toHit - defence;
         attacker.hasBonus = false;
         defender.hasBonus = false;
+
+        resultsText.text += attacker.name + " rolls " + toHit + " for attack.\n";        
+        resultsText.text += defender.name + " rolls " + defence + " for defence.\n";
+
         if (result < -2)
         {
             defender.hasBonus = true;
@@ -109,6 +113,8 @@ public class GameManager : MonoBehaviour {
             //defender.soak(damage);
             resultsText.text += defender.name + " suffers " + damage + " shifts of damage! Ouch!\n";
         }
+        Canvas.ForceUpdateCanvases();
+        scrollbar.value = 0;
         activeCombatant = nextCombatant;
     }
 
