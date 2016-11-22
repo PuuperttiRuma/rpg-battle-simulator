@@ -11,29 +11,108 @@ public class GameManager : MonoBehaviour {
     public GameObject popupMenu;
 
     List<Combatant> combatants = new List<Combatant>();
-    CharacterCreator newCombatant;
+    CharacterCreator characterCreator;
     int[] rolls = new int[6];
+    Combatant activeCombatant;
+    Combatant nextCombatant;
+
 
     void Awake()
     {
-        newCombatant = GetComponent<CharacterCreator>();
+        characterCreator = GetComponent<CharacterCreator>();
+        debugCombatants();
+    }
+
+    private void debugCombatants()
+    {
+        combatants.Add(new Combatant("Allie", 3, 4, 8, 2));
+        combatants.Add(new Combatant("Bellie", 3, 4, 8, 2));
+        activeCombatant = combatants[0];
+        showStats();
     }
 
     public void CreateCombatant()
     {
-        newCombatant.updateTexts();
-        newCombatant.checkFields();
+        characterCreator.updateTexts();
+        characterCreator.checkFields();
         popupMenu.SetActive(true);
         //Combatant dude = new Combatant("Dude", 3, 4, 8, 2);
     }
 
     public void disablePopupMenu()
     {
-        combatants.Add(new Combatant(newCombatant));
+        combatants.Add(new Combatant(characterCreator));
+        activeCombatant = combatants[0];
         popupMenu.SetActive(false);
         showStats();
     }
 
+    void setNextCombatant()
+    {
+        int i = combatants.IndexOf(activeCombatant);
+        if (i+1 < combatants.Count)
+        {
+            nextCombatant = combatants[i+1];
+        }
+        else
+        {
+            nextCombatant = combatants[0];
+        }
+    }
+
+    public void doNextTurn()
+    {
+        //TODO: varmista että voi hyökätä vain jos väh. 2 taistelijaa!
+
+        setNextCombatant();
+        if (activeCombatant.attackTarget == null)
+        {
+            activeCombatant.attackTarget = nextCombatant;
+        }
+        Combatant attacker = activeCombatant;
+        Combatant defender = activeCombatant.attackTarget;
+        int toHit = attacker.attack();
+        resultsText.text += attacker.name + " rolls " + toHit + " for attack.\n";
+        int defence = defender.defend();
+        resultsText.text += defender.name + " rolls " + defence + " for defence.\n";
+        //TODO defender käyttää bonuksen vain jos on tulossa osuma
+        int result = toHit - defence;
+        attacker.hasBonus = false;
+        defender.hasBonus = false;
+        if (result < -2)
+        {
+            defender.hasBonus = true;
+            resultsText.text += defender.name + " succeeds in her defence with style and gets a boost!\n";
+        }
+        else if (result < 0)
+        {
+            resultsText.text += defender.name + " succeeds in her defence.\n";
+        }
+        else if (result == 0)
+        {
+            attacker.hasBonus = true;
+            resultsText.text += defender.name + " succeeds in her defence, but just barely. " + attacker.name + " gets a boost!\n";
+        }
+        else if (result > 0)
+        {
+            int damage = (attacker.damage(result));
+            
+            if (result > 2)
+            {
+                attacker.hasBonus = true;
+                resultsText.text += attacker.name + " succeeds with style in her attack and gets a boost!\n";
+            }
+            else
+            {
+                resultsText.text += attacker.name + " succeeds in her attack!\n";
+            }
+            //defender.soak(damage);
+            resultsText.text += defender.name + " suffers " + damage + " shifts of damage! Ouch!\n";
+        }
+        activeCombatant = nextCombatant;
+    }
+
+    //Debugging method, not in use anymore
     public void rollDie(int amount)
     {
         for (int i = 0; i < amount; i++)
@@ -55,7 +134,11 @@ public class GameManager : MonoBehaviour {
 
     void showStats()
     {
-        statsText.text = combatants[0].printStats();
+        statsText.text = "Name \t AT \t Sk \t St \t C \t A+ \t D+ \t AV \t W\n";
+        foreach (Combatant i in combatants)
+        {
+            statsText.text += i.printStats() + "\n";
+        }
     }
 
     void showResults()
