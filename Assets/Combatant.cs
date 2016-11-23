@@ -69,7 +69,6 @@ public class Combatant {
 
     public void soak(int damage)
     {
-        throw new NotImplementedException();
     }
 
     public int damage(int rawdamage)

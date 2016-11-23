@@ -9,8 +9,9 @@ public class GameManager : MonoBehaviour {
     public Text resultsText;
     public Text statsText;
     public GameObject popupMenu;
-    public Scrollbar scrollbar;
+    public Scrollbar scrollbar;    
 
+    enum FateSuccessType {CritFailure, Failure, Tie, Success, CritSuccess};
     List<Combatant> combatants = new List<Combatant>();
     CharacterCreator characterCreator;
     int[] rolls = new int[6];
@@ -61,10 +62,10 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    public void doNextTurn()
+    //TODO: varmista että voi hyökätä vain jos väh. 2 taistelijaa!
+    //TODO defender käyttää bonuksen vain jos on tulossa osuma
+    public void doNextTurn(bool printToCombatLog)
     {
-        //TODO: varmista että voi hyökätä vain jos väh. 2 taistelijaa!
-
         setNextCombatant();
         if (activeCombatant.attackTarget == null)
         {
@@ -75,47 +76,41 @@ public class GameManager : MonoBehaviour {
         int toHit = attacker.attack();
         int defence = defender.defend();
 
-        //TODO defender käyttää bonuksen vain jos on tulossa osuma
-        int result = toHit - defence;
         attacker.hasBonus = false;
         defender.hasBonus = false;
 
-        resultsText.text += attacker.name + " rolls " + toHit + " for attack.\n";        
-        resultsText.text += defender.name + " rolls " + defence + " for defence.\n";
+        String hitEffects = effectuateAttack(toHit - defence, attacker, defender); 
 
-        if (result < -2)
-        {
-            defender.hasBonus = true;
-            resultsText.text += defender.name + " succeeds in her defence with style and gets a boost!\n";
+        if (printToCombatLog) {
+            resultsText.text += attacker.name + " rolls " + toHit + " for attack.\n";
+            resultsText.text += defender.name + " rolls " + defence + " for defence.\n";
+            resultsText.text += hitEffects;
         }
-        else if (result < 0)
-        {
-            resultsText.text += defender.name + " succeeds in her defence.\n";
-        }
-        else if (result == 0)
-        {
-            attacker.hasBonus = true;
-            resultsText.text += defender.name + " succeeds in her defence, but just barely. " + attacker.name + " gets a boost!\n";
-        }
-        else if (result > 0)
-        {
-            int damage = (attacker.damage(result));
-            
-            if (result > 2)
-            {
-                attacker.hasBonus = true;
-                resultsText.text += attacker.name + " succeeds with style in her attack and gets a boost!\n";
-            }
-            else
-            {
-                resultsText.text += attacker.name + " succeeds in her attack!\n";
-            }
-            //defender.soak(damage);
-            resultsText.text += defender.name + " suffers " + damage + " shifts of damage! Ouch!\n";
-        }
+
         Canvas.ForceUpdateCanvases();
         scrollbar.value = 0;
         activeCombatant = nextCombatant;
+    }
+
+    private String effectuateAttack(int rollResult, Combatant attacker, Combatant defender) {
+
+        int damage = attacker.damage(rollResult);
+
+        if (rollResult < -2) {
+            defender.hasBonus = true;
+            return defender.name + " defends with such style that she gets a boost!\n";
+        } else if (rollResult < 0) {
+            return defender.name + " defends.\n";
+        } else if (rollResult == 0) {
+            attacker.hasBonus = true;
+            return defender.name + " succeeds in her defence, but just barely. " + attacker.name + " gets a boost!\n";
+        } else if (rollResult > 2) {
+            defender.soak(damage);
+            return "Beautiful hit! " + attacker.name + " hits with style and graze and deals " + damage + " shifts of damage to " + defender.name + "!\n";
+        } else {
+            defender.soak(damage);
+            return "Hit! " + attacker.name + " hits and deals " + damage + " shifts of damage to " + defender.name + "!\n";
+        }
     }
 
     //Debugging method, not in use anymore
@@ -140,7 +135,7 @@ public class GameManager : MonoBehaviour {
 
     void showStats()
     {
-        statsText.text = "Name \t AT \t Sk \t St \t C \t A+ \t D+ \t AV \t W\n";
+        statsText.text = "Name \t\t AT \t Sk \t St \t C \t A+ \t D+ \t AV \t W\n";
         foreach (Combatant i in combatants)
         {
             statsText.text += i.printStats() + "\n";
