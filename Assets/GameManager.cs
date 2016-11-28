@@ -4,20 +4,20 @@ using UnityEngine.UI;
 using System;
 using System.Collections.Generic;
 
-public class GameManager : MonoBehaviour {
+public class GameManager : MonoBehaviour
+{
 
     public Text resultsText;
     public Text statsText;
     public GameObject popupMenu;
-    public Scrollbar scrollbar;    
+    public Scrollbar scrollbar;
 
-    enum FateSuccessType {CritFailure, Failure, Tie, Success, CritSuccess};
     List<Combatant> combatants = new List<Combatant>();
     CharacterCreator characterCreator;
     int[] rolls = new int[6];
     Combatant activeCombatant;
     Combatant nextCombatant;
-
+    int roundCounter = 1;
 
     void Awake()
     {
@@ -52,13 +52,19 @@ public class GameManager : MonoBehaviour {
     void setNextCombatant()
     {
         int i = combatants.IndexOf(activeCombatant);
-        if (i+1 < combatants.Count)
+        if (i == 0)
         {
-            nextCombatant = combatants[i+1];
+            resultsText.text += "Round number " + roundCounter + " starts.\n";
+        }
+
+        if (i + 1 < combatants.Count)
+        {
+            nextCombatant = combatants[i + 1];
         }
         else
         {
             nextCombatant = combatants[0];
+            roundCounter++;
         }
     }
 
@@ -79,58 +85,61 @@ public class GameManager : MonoBehaviour {
         attacker.hasBonus = false;
         defender.hasBonus = false;
 
-        String hitEffects = effectuateAttack(toHit - defence, attacker, defender); 
+        String hitEffects = effectuateAttack(toHit - defence, attacker, defender);
 
-        if (printToCombatLog) {
+        if (printToCombatLog)
+        {
             resultsText.text += attacker.name + " rolls " + toHit + " for attack.\n";
             resultsText.text += defender.name + " rolls " + defence + " for defence.\n";
             resultsText.text += hitEffects;
         }
-
-        Canvas.ForceUpdateCanvases();
-        scrollbar.value = 0;
         activeCombatant = nextCombatant;
     }
 
-    private String effectuateAttack(int rollResult, Combatant attacker, Combatant defender) {
+    public void scrollDownLog()
+    {
+        Canvas.ForceUpdateCanvases();
+        scrollbar.value = 0;
+    }
+
+    public void doNextRound(bool printToCombatLog)
+    {
+        int roundNumberNow = roundCounter;
+        while (roundCounter == roundNumberNow)
+        {
+            doNextTurn(printToCombatLog);
+        }
+    }
+
+    private String effectuateAttack(int rollResult, Combatant attacker, Combatant defender)
+    {
 
         int damage = attacker.damage(rollResult);
 
-        if (rollResult < -2) {
+        if (rollResult < -2)
+        {
             defender.hasBonus = true;
             return defender.name + " defends with such style that she gets a boost!\n";
-        } else if (rollResult < 0) {
+        }
+        else if (rollResult < 0)
+        {
             return defender.name + " defends.\n";
-        } else if (rollResult == 0) {
+        }
+        else if (rollResult == 0)
+        {
             attacker.hasBonus = true;
             return defender.name + " succeeds in her defence, but just barely. " + attacker.name + " gets a boost!\n";
-        } else if (rollResult > 2) {
+        }
+        else if (rollResult > 2)
+        {
             defender.soak(damage);
             return "Beautiful hit! " + attacker.name + " hits with style and graze and deals " + damage + " shifts of damage to " + defender.name + "!\n";
-        } else {
+        }
+        else
+        {
             defender.soak(damage);
             return "Hit! " + attacker.name + " hits and deals " + damage + " shifts of damage to " + defender.name + "!\n";
         }
-    }
-
-    //Debugging method, not in use anymore
-    public void rollDie(int amount)
-    {
-        for (int i = 0; i < amount; i++)
-        {
-            rolls[Roller.roll(6) - 1]++;
-        }
-        showResults();
-    }
-
-    int sumOfArray(int[] array)
-    {
-        int sum = 0;
-        for (int i = 0; i < array.Length; i++)
-        {
-            sum += array[i];
-        }
-        return sum;
     }
 
     void showStats()
@@ -158,12 +167,34 @@ public class GameManager : MonoBehaviour {
             rollsSummed /= 1000000;
             rollsText = rollsSummed + "M";
         }
-        if (rollsSummed > 1000) {
+        if (rollsSummed > 1000)
+        {
             rollsSummed /= 1000;
             rollsText = rollsSummed + "K";
         }
-        
+
         resultsText.text += "\nRolled the dice " + rollsText + " times.";
+    }
+
+    //Debugging method, not in use anymore
+    int sumOfArray(int[] array)
+    {
+        int sum = 0;
+        for (int i = 0; i < array.Length; i++)
+        {
+            sum += array[i];
+        }
+        return sum;
+    }
+
+    //Debugging method, not in use anymore
+    public void rollDie(int amount)
+    {
+        for (int i = 0; i < amount; i++)
+        {
+            rolls[Roller.roll(6) - 1]++;
+        }
+        showResults();
     }
 
 }
