@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
     public Text resultsText;
     public Text statsText;
     public GameObject popupMenu;
-    public Scrollbar scrollbar;
+    public ScrollRect logScroll;
 
     List<Combatant> combatants = new List<Combatant>();
     CharacterCreator characterCreator;
@@ -92,6 +92,7 @@ public class GameManager : MonoBehaviour
             resultsText.text += attacker.name + " rolls " + toHit + " for attack.\n";
             resultsText.text += defender.name + " rolls " + defence + " for defence.\n";
             resultsText.text += hitEffects;
+            scrollDownLog();
         }
         activeCombatant = nextCombatant;
     }
@@ -99,7 +100,7 @@ public class GameManager : MonoBehaviour
     public void scrollDownLog()
     {
         Canvas.ForceUpdateCanvases();
-        scrollbar.value = 0;
+        logScroll.verticalNormalizedPosition = 0.0f;
     }
 
     public void doNextRound(bool printToCombatLog)

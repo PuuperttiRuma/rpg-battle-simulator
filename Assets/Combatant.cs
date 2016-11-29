@@ -96,8 +96,8 @@ public class Combatant {
 
     public String printStats()
     {
-        string stats = name + " \t  " + fightAttribute  + " \t  " + fightSkill + " \t  " + stress.Length
-            + " \t  " + (consequences.Length-1)*2 + " \t  " + attackBonus + " \t  " + defenceBonus + " \t  " + armorValue + " \t  " + weaponDamage;
+        string stats = name + " \t\t " + fightAttribute  + " \t " + fightSkill + " \t " + stress.Length
+            + " \t " + (consequences.Length-1)*2 + " \t " + attackBonus + " \t " + defenceBonus + " \t " + armorValue + " \t " + weaponDamage;
         return stats;
     }
 

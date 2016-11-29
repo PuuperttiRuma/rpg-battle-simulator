@@ -2612,7 +2612,7 @@ MonoBehaviour:
   resultsText: {fileID: 639661000}
   statsText: {fileID: 1372919624}
   popupMenu: {fileID: 1374162460}
-  scrollbar: {fileID: 679925203}
+  logScroll: {fileID: 1138751085}
 --- !u!114 &862192528
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4273,7 +4273,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Name\tAt\tSk\tSt\tC\tA+\tD+\tAV\tW"
+  m_Text: "Name\t\t At \t Sk \t St \t C \t A+ \t D+ \t AV \t W "
 --- !u!222 &1372919625
 CanvasRenderer:
   m_ObjectHideFlags: 0
