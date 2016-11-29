@@ -7,6 +7,7 @@ public class Combatant {
     public Combatant attackTarget;
     public bool hasBonus = false;
     public string name { get; internal set; }
+    public bool isDead { get; internal set; }
 
     int[] stress;
     int[] consequences;
@@ -67,9 +68,47 @@ public class Combatant {
         return defence;
     }
 
-    public void soak(int damage)
+    public String soak(int damage)
     {
+        damage -= armorValue;
+        if (damage < 1)
+        {
+            return "Fortunately for " + name + " her armor is good enough to stop the damage.\n";
+        }
+        // Check whether there is a way to soak damage without overcompensation.
+        for (int c = 0; c < consequences.Length; c++)
+        {
+            for (int s = 0; s < stress.Length; s++)
+            {
+                if (damage == stress[s]+consequences[c])
+                {
+                    String output = name + " soaks the damage with " + stress[s] + " stress and " + consequences[c] + " consequence.\n";
+                    stress[s] = 0;
+                    consequences[c] = 0;
+                    return output;
+                }
+            }
+        }
+        // Check whether there is a way to soak damage at all.
+        for (int c = 0; c < consequences.Length; c++)
+        {
+            for (int s = 0; s < stress.Length; s++)
+            {
+                if (damage <= stress[s] + consequences[c])
+                {
+                    String output = name + " soaks the damage with " + stress[s] + " stress and " + consequences[c] + " consequence.\n";
+                    stress[s] = 0;
+                    consequences[c] = 0;
+                    return output;
+                }
+            }
+        }
+        //Because soaking the damage isn't possible, the defender is taken out.
+        isDead = true;
+        return name + " can't soak the damage and is taken out!!\n";
     }
+
+
 
     public int damage(int rawdamage)
     {
@@ -96,9 +135,43 @@ public class Combatant {
 
     public String printStats()
     {
-        string stats = name + " \t\t " + fightAttribute  + " \t " + fightSkill + " \t " + stress.Length
-            + " \t " + (consequences.Length-1)*2 + " \t " + attackBonus + " \t " + defenceBonus + " \t " + armorValue + " \t " + weaponDamage;
+        string stats = name + " \t\t " + fightAttribute  + " \t " + fightSkill + " \t " + printStress()
+            + " \t " + printConsequences() + " \t\t\t " + attackBonus + " \t " + defenceBonus + " \t " + armorValue + " \t " + weaponDamage;
         return stats;
+    }
+
+    private String printStress()
+    {
+        String output = "";
+        for (int i = 0; i < stress.Length; i++)
+        {
+            if (stress[i] == 0)
+            {
+                output += "[x]";
+            }
+            else
+            {
+                output += "[  ]";
+            }
+        }
+        return output;
+    }
+
+    private String printConsequences()
+    {
+        String output = "";
+        for (int i = 1; i < consequences.Length; i++)
+        {
+            if (consequences[i] == 0)
+            {
+                output += "[x]";
+            }
+            else
+            {
+                output += "[" + consequences[i] + "]";
+            }
+        }
+        return output;
     }
 
 }

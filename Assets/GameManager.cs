@@ -54,7 +54,7 @@ public class GameManager : MonoBehaviour
         int i = combatants.IndexOf(activeCombatant);
         if (i == 0)
         {
-            resultsText.text += "Round number " + roundCounter + " starts.\n";
+            resultsText.text += "ROUND " + roundCounter + "!\n";
         }
 
         if (i + 1 < combatants.Count)
@@ -66,6 +66,12 @@ public class GameManager : MonoBehaviour
             nextCombatant = combatants[0];
             roundCounter++;
         }
+    }
+
+    public void scrollDownLog()
+    {
+        Canvas.ForceUpdateCanvases();
+        logScroll.verticalNormalizedPosition = 0.0f;
     }
 
     //TODO: varmista että voi hyökätä vain jos väh. 2 taistelijaa!
@@ -86,23 +92,22 @@ public class GameManager : MonoBehaviour
         defender.hasBonus = false;
 
         String hitEffects = effectuateAttack(toHit - defence, attacker, defender);
+        /*if (defender.isDead)
+        {
+            
+        }*/
 
         if (printToCombatLog)
         {
             resultsText.text += attacker.name + " rolls " + toHit + " for attack.\n";
             resultsText.text += defender.name + " rolls " + defence + " for defence.\n";
             resultsText.text += hitEffects;
+            showStats();
             scrollDownLog();
         }
         activeCombatant = nextCombatant;
     }
-
-    public void scrollDownLog()
-    {
-        Canvas.ForceUpdateCanvases();
-        logScroll.verticalNormalizedPosition = 0.0f;
-    }
-
+    
     public void doNextRound(bool printToCombatLog)
     {
         int roundNumberNow = roundCounter;
@@ -132,20 +137,18 @@ public class GameManager : MonoBehaviour
             return defender.name + " succeeds in her defence, but just barely. " + attacker.name + " gets a boost!\n";
         }
         else if (rollResult > 2)
-        {
-            defender.soak(damage);
-            return "Beautiful hit! " + attacker.name + " hits with style and graze and deals " + damage + " shifts of damage to " + defender.name + "!\n";
+        {            
+            return "Beautiful hit! " + attacker.name + " hits with style and graze and deals " + damage + " shifts of damage to " + defender.name + "!\n" + defender.soak(damage);
         }
         else
         {
-            defender.soak(damage);
-            return "Hit! " + attacker.name + " hits and deals " + damage + " shifts of damage to " + defender.name + "!\n";
+            return "Hit! " + attacker.name + " hits and deals " + damage + " shifts of damage to " + defender.name + "!\n" + defender.soak(damage);
         }
     }
 
     void showStats()
     {
-        statsText.text = "Name \t\t AT \t Sk \t St \t C \t A+ \t D+ \t AV \t W\n";
+        statsText.text = "";
         foreach (Combatant i in combatants)
         {
             statsText.text += i.printStats() + "\n";
