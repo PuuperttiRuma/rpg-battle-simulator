@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 public class Combatant {
 
@@ -8,6 +9,10 @@ public class Combatant {
     public bool hasBonus = false;
     public string name { get; internal set; }
     public bool isDead { get; internal set; }
+
+    int wins;
+    Dictionary<int, WinRound> winRounds = new Dictionary<int, WinRound>();
+    Dictionary<string, WinHealth> winHealths = new Dictionary<string, WinHealth>();
 
     int[] stress;
     int[] consequences;
@@ -32,7 +37,7 @@ public class Combatant {
         isDead = false;
     }
 
-    public Combatant(string combatantName, int stress, int conseqs, int fightAttribute, int fightSkill, int armorValue, int weaponDamage)
+    public Combatant(string combatantName, int fightAttribute, int fightSkill, int stress, int conseqs, int weaponDamage, int armorValue)
     {
         this.name = combatantName;
         populateStress(stress);
@@ -120,8 +125,35 @@ public class Combatant {
     internal void resetHealth()
     {
         populateStress(stress.Length);
-        populateConseqs(consequences.Length); //DEBUG: pieleeen!
+        populateConseqs((consequences.Length-1)*2); //DEBUG: pieleeen!
         isDead = false;
+    }
+
+    public void win(int round)
+    {
+        //Update win count
+        wins++;
+
+        //Update winning round numbers
+        if (winRounds.ContainsKey(round))
+        {
+            winRounds[round].count++;
+        }
+        else
+        {
+            winRounds.Add(round, new WinRound(round));
+        }
+
+        //Update winning health stats
+        if (winHealths.ContainsKey(printConsequences()))
+        {
+            winHealths[printConsequences()].count++;
+        }
+        else
+        {
+            winHealths.Add(printConsequences(), new WinHealth(printConsequences()));
+        }
+
     }
 
     public int damage(int rawdamage)
@@ -150,7 +182,7 @@ public class Combatant {
     public String printStats()
     {
         string stats = name + " \t\t " + fightAttribute  + " \t " + fightSkill + " \t " + printStress()
-            + " \t " + printConsequences() + " \t\t\t " + attackBonus + " \t " + defenceBonus + " \t " + armorValue + " \t " + weaponDamage;
+            + " \t\t " + printConsequences() + " \t\t\t " + attackBonus + " \t " + defenceBonus + " \t " + armorValue + " \t " + weaponDamage;
         return stats;
     }
 
@@ -188,4 +220,28 @@ public class Combatant {
         return output;
     }
 
+    //##################
+    //# RESULT CLASSES #
+    //##################
+    class WinRound
+    {
+        int round;
+        internal int count;
+
+        public WinRound(int round)
+        {
+            this.round = round;
+        }
+    }
+
+    class WinHealth
+    {
+        string health;
+        internal int count;
+
+        public WinHealth(string health)
+        {
+            this.health = health;
+        }
+    }
 }

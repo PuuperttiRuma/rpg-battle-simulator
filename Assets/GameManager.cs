@@ -18,6 +18,8 @@ public class GameManager : MonoBehaviour
     Combatant activeCombatant;
     Combatant nextCombatant;
     int roundNumber = 1;
+    int combatCount = 0;
+
 
     void Awake()
     {
@@ -28,8 +30,8 @@ public class GameManager : MonoBehaviour
 
     private void debugCombatants()
     {
-        combatants.Add(new Combatant("Annie", 3, 4, 8, 2, 1, 0));
-        combatants.Add(new Combatant("Belle", 3, 4, 8, 2, 1, 0));
+        combatants.Add(new Combatant("Annie", 8, 2, 2, 6, 0, 0));
+        combatants.Add(new Combatant("Belle", 8, 2, 4, 4, 0, 0));
         activeCombatant = combatants[0];
         showStats();
     }
@@ -93,26 +95,35 @@ public class GameManager : MonoBehaviour
         defender.hasBonus = false;
 
         String hitEffects = effectuateAttack(toHit - defence, attacker, defender);
-        if (defender.isDead)
+        if (defender.isDead) endCombat(attacker);
+        if (printToCombatLog) printCombatLog(attacker.name, defender.name, toHit, defence, hitEffects);        
+
+        activeCombatant = nextCombatant;
+    }
+
+    void endCombat(Combatant winner)
+    {
+        //Mark down the results
+        winner.win(combatCount);
+
+        //Reset combatants and turn counters etc.
+        combatCount++;
+        roundNumber = 0;
+        nextCombatant = combatants[0];
+        foreach (Combatant combatant in combatants)
         {
-            resultsManager.addResult(attacker.name, roundNumber, attacker.printConsequences());
-            roundNumber = 0;
-            nextCombatant = combatants[0];
-            foreach (Combatant combatant in combatants)
-            {
-                combatant.resetHealth();
-            }
+            combatant.resetHealth();
         }
 
-        if (printToCombatLog)
-        {
-            combatLogText.text += attacker.name + " rolls " + toHit + " for attack.\n";
-            combatLogText.text += defender.name + " rolls " + defence + " for defence.\n";
-            combatLogText.text += hitEffects;
-            showStats();
-            scrollDownLog();
-        }
-        activeCombatant = nextCombatant;
+    }
+
+    void printCombatLog(String attackerName, String defenderName, int toHit, int defence, String hitEffects)
+    {
+        combatLogText.text += attackerName + " rolls " + toHit + " for attack.\n";
+        combatLogText.text += defenderName + " rolls " + defence + " for defence.\n";
+        combatLogText.text += hitEffects;
+        showStats();
+        scrollDownLog();
     }
     
     public void doNextRound(bool printToCombatLog)
