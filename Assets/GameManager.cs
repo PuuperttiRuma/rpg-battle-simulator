@@ -6,29 +6,30 @@ using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
-
-    public Text resultsText;
+    public Text combatLogText;
+    public Text resultsLogText;
     public Text statsText;
     public GameObject popupMenu;
     public ScrollRect logScroll;
 
     List<Combatant> combatants = new List<Combatant>();
     CharacterCreator characterCreator;
-    int[] rolls = new int[6];
+    ResultsManager resultsManager;
     Combatant activeCombatant;
     Combatant nextCombatant;
-    int roundCounter = 1;
+    int roundNumber = 1;
 
     void Awake()
     {
         characterCreator = GetComponent<CharacterCreator>();
+        resultsManager = new ResultsManager(resultsLogText);
         debugCombatants();
     }
 
     private void debugCombatants()
     {
-        combatants.Add(new Combatant("Annie", 3, 4, 8, 2));
-        combatants.Add(new Combatant("Belle", 3, 4, 8, 2));
+        combatants.Add(new Combatant("Annie", 3, 4, 8, 2, 1, 0));
+        combatants.Add(new Combatant("Belle", 3, 4, 8, 2, 1, 0));
         activeCombatant = combatants[0];
         showStats();
     }
@@ -54,7 +55,7 @@ public class GameManager : MonoBehaviour
         int i = combatants.IndexOf(activeCombatant);
         if (i == 0)
         {
-            resultsText.text += "ROUND " + roundCounter + "!\n";
+            combatLogText.text += "ROUND " + roundNumber + "!\n";
         }
 
         if (i + 1 < combatants.Count)
@@ -64,7 +65,7 @@ public class GameManager : MonoBehaviour
         else
         {
             nextCombatant = combatants[0];
-            roundCounter++;
+            roundNumber++;
         }
     }
 
@@ -92,16 +93,22 @@ public class GameManager : MonoBehaviour
         defender.hasBonus = false;
 
         String hitEffects = effectuateAttack(toHit - defence, attacker, defender);
-        /*if (defender.isDead)
+        if (defender.isDead)
         {
-            
-        }*/
+            resultsManager.addResult(attacker.name, roundNumber, attacker.printConsequences());
+            roundNumber = 0;
+            nextCombatant = combatants[0];
+            foreach (Combatant combatant in combatants)
+            {
+                combatant.resetHealth();
+            }
+        }
 
         if (printToCombatLog)
         {
-            resultsText.text += attacker.name + " rolls " + toHit + " for attack.\n";
-            resultsText.text += defender.name + " rolls " + defence + " for defence.\n";
-            resultsText.text += hitEffects;
+            combatLogText.text += attacker.name + " rolls " + toHit + " for attack.\n";
+            combatLogText.text += defender.name + " rolls " + defence + " for defence.\n";
+            combatLogText.text += hitEffects;
             showStats();
             scrollDownLog();
         }
@@ -110,14 +117,14 @@ public class GameManager : MonoBehaviour
     
     public void doNextRound(bool printToCombatLog)
     {
-        int roundNumberNow = roundCounter;
-        while (roundCounter == roundNumberNow)
+        int roundNumberNow = roundNumber;
+        while (roundNumber == roundNumberNow)
         {
             doNextTurn(printToCombatLog);
         }
     }
 
-    private String effectuateAttack(int rollResult, Combatant attacker, Combatant defender)
+    private string effectuateAttack(int rollResult, Combatant attacker, Combatant defender)
     {
 
         int damage = attacker.damage(rollResult);
@@ -155,43 +162,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void showResults()
-    {
-        resultsText.text = "";
-        int rollsSummed = sumOfArray(rolls);
-        for (int i = 0; i < rolls.Length; i++)
-        {
-            float result = (float)rolls[i] / (float)rollsSummed;
-            resultsText.text += i + 1 + ": " + result.ToString("P") + "\n";
-        }
-
-        String rollsText = rollsSummed.ToString();
-        if (rollsSummed > 1000000)
-        {
-            rollsSummed /= 1000000;
-            rollsText = rollsSummed + "M";
-        }
-        if (rollsSummed > 1000)
-        {
-            rollsSummed /= 1000;
-            rollsText = rollsSummed + "K";
-        }
-
-        resultsText.text += "\nRolled the dice " + rollsText + " times.";
-    }
-
-    //Debugging method, not in use anymore
-    int sumOfArray(int[] array)
-    {
-        int sum = 0;
-        for (int i = 0; i < array.Length; i++)
-        {
-            sum += array[i];
-        }
-        return sum;
-    }
-
-    //Debugging method, not in use anymore
+    /*Debugging method, not in use anymore
     public void rollDie(int amount)
     {
         for (int i = 0; i < amount; i++)
@@ -199,6 +170,6 @@ public class GameManager : MonoBehaviour
             rolls[Roller.roll(6) - 1]++;
         }
         showResults();
-    }
+    }*/
 
 }

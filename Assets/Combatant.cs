@@ -29,15 +29,19 @@ public class Combatant {
         Int32.TryParse(creator.defenseBonusField.text, out defenceBonus);
         Int32.TryParse(creator.armorValueField.text, out armorValue);
         Int32.TryParse(creator.weaponDamageField.text, out weaponDamage);
+        isDead = false;
     }
 
-    public Combatant(string combatantName, int stress, int conseqs, int fightAttribute, int fightSkill)
+    public Combatant(string combatantName, int stress, int conseqs, int fightAttribute, int fightSkill, int armorValue, int weaponDamage)
     {
         this.name = combatantName;
         populateStress(stress);
         populateConseqs(conseqs);
         this.fightAttribute = fightAttribute;
         this.fightSkill = fightSkill;
+        this.armorValue = armorValue;
+        this.weaponDamage = weaponDamage;
+        isDead = false;
     }
 
     public int attack()
@@ -70,10 +74,15 @@ public class Combatant {
 
     public String soak(int damage)
     {
-        damage -= armorValue;
-        if (damage < 1)
+        String output = "";
+        if (damage <= armorValue)
         {
             return "Fortunately for " + name + " her armor is good enough to stop the damage.\n";
+        }
+        if (armorValue > 0)
+        {
+            damage -= armorValue;
+            output = name + "'s armor negates " + armorValue + " shifts of damage.\n";
         }
         // Check whether there is a way to soak damage without overcompensation.
         for (int c = 0; c < consequences.Length; c++)
@@ -82,7 +91,7 @@ public class Combatant {
             {
                 if (damage == stress[s]+consequences[c])
                 {
-                    String output = name + " soaks the damage with " + stress[s] + " stress and " + consequences[c] + " consequence.\n";
+                    output += name + " soaks the damage with " + stress[s] + " stress and " + consequences[c] + " consequence.\n";
                     stress[s] = 0;
                     consequences[c] = 0;
                     return output;
@@ -96,7 +105,7 @@ public class Combatant {
             {
                 if (damage <= stress[s] + consequences[c])
                 {
-                    String output = name + " soaks the damage with " + stress[s] + " stress and " + consequences[c] + " consequence.\n";
+                    output = name + " soaks the damage with " + stress[s] + " stress and " + consequences[c] + " consequence.\n";
                     stress[s] = 0;
                     consequences[c] = 0;
                     return output;
@@ -108,7 +117,12 @@ public class Combatant {
         return name + " can't soak the damage and is taken out!!\n";
     }
 
-
+    internal void resetHealth()
+    {
+        populateStress(stress.Length);
+        populateConseqs(consequences.Length); //DEBUG: pieleeen!
+        isDead = false;
+    }
 
     public int damage(int rawdamage)
     {
@@ -140,7 +154,7 @@ public class Combatant {
         return stats;
     }
 
-    private String printStress()
+    public String printStress()
     {
         String output = "";
         for (int i = 0; i < stress.Length; i++)
@@ -157,7 +171,7 @@ public class Combatant {
         return output;
     }
 
-    private String printConsequences()
+    public String printConsequences()
     {
         String output = "";
         for (int i = 1; i < consequences.Length; i++)
