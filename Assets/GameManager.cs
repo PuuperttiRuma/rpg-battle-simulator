@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour
     public Text statsText;
     public GameObject popupMenu;
     public ScrollRect logScroll;
+    public Button startAutoCombatButton;
+    public Button stopAutoCombatButton;
 
     List<Combatant> combatants = new List<Combatant>();
     CharacterCreator characterCreator;
@@ -119,13 +121,24 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    /*
-    public IEnumerator doCombats()
+    public void autoResolveCombats(bool start)
     {
+        if (start)
+        {
+            startAutoCombatButton.interactable = false;
+            stopAutoCombatButton.interactable = true;
+        }
+        else
+        {
+            startAutoCombatButton.interactable = true;
+            stopAutoCombatButton.interactable = false;
+        }
+        /*
         while(buttonDown){
             yield return null;
         }
-    } */
+        yield return null;*/
+    }
 
     void endCombat(Combatant winner)
     {
