@@ -11,8 +11,8 @@ public class GameManager : MonoBehaviour
     public Text statsText;
     public GameObject popupMenu;
     public ScrollRect logScroll;
-    public Button startAutoCombatButton;
-    public Button stopAutoCombatButton;
+    public Text autoCombatButtonText;
+    public InputField AutoCombatIncrements;
 
     List<Combatant> combatants = new List<Combatant>();
     CharacterCreator characterCreator;
@@ -21,7 +21,10 @@ public class GameManager : MonoBehaviour
     Combatant nextCombatant;
     int roundNumber = 1;
     int combatCount = 0;
+    bool autoCombatToggle = false;
+    int ACIncrement = 1;
 
+    float debugtimer;
 
     void Awake()
     {
@@ -97,7 +100,7 @@ public class GameManager : MonoBehaviour
         defender.hasBonus = false;
 
         String hitEffects = effectuateAttack(toHit - defence, attacker, defender);
-        if (defender.isDead) endCombat(attacker);
+        if (defender.isDead) endCombat(attacker, printToCombatLog);
         if (printToCombatLog) printCombatLog(attacker.name, defender.name, toHit, defence, hitEffects);        
 
         activeCombatant = nextCombatant;
@@ -121,31 +124,78 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void autoResolveCombats(bool start)
+    public void do100Combat()
     {
-        if (start)
+        for (int i = 0; i < 100; i++)
         {
-            startAutoCombatButton.interactable = false;
-            stopAutoCombatButton.interactable = true;
+            int combatCountNow = combatCount;
+            while (combatCountNow == combatCount)
+            {
+                doNextRound(false);
+            }
+        }
+        showResults();
+
+    }
+
+    public void autoResolveCombats()
+    {
+        if (!autoCombatToggle)
+        {
+            autoCombatToggle = true;
+            autoCombatButtonText.text = "Stop Auto Combat";
+            StartCoroutine(autoCombat());            
         }
         else
         {
-            startAutoCombatButton.interactable = true;
-            stopAutoCombatButton.interactable = false;
+            //StopCoroutine(autoCombat());
+            autoCombatButtonText.text = "Start Auto Combat";
+            autoCombatToggle = false;
         }
-        /*
-        while(buttonDown){
-            yield return null;
-        }
-        yield return null;*/
     }
 
-    void endCombat(Combatant winner)
+    IEnumerator autoCombat()
+    {
+        //float debugtimer = 0;
+        while(autoCombatToggle && debugtimer < 2)
+        {
+            for (int i = 0; i < ACIncrement; i++)
+            {
+                doNextCombat();
+            }            
+            showResults();
+            //calculator++;
+            //debugtimer += Time.deltaTime;
+            yield return null;
+        }
+        
+    }
+
+    public void checkACIncrement()
+    {
+        int value;
+        if (Int32.TryParse(AutoCombatIncrements.text, out value))
+        {
+            if (value >= 300) value = 300;
+            ACIncrement = value;
+            //warningText.text = "";
+            //createButton.interactable = true;
+        }
+        else
+        {
+            //warningText.text = "Modifiers can only be whole numbers.";
+            //createButton.interactable = false;
+            ACIncrement = 1;
+            return;
+        }
+    }
+
+    void endCombat(Combatant winner, bool printToCombatLog)
     {
         //Mark down the results
         combatCount++;
         winner.win(combatCount);
-        showResults();
+        if (printToCombatLog) showResults();
 
         //Reset combatants and turn counters etc.
         roundNumber = 0;
@@ -209,7 +259,7 @@ public class GameManager : MonoBehaviour
         resultsLogText.text += "Battles fought: " + combatCount +"\n";
         foreach (Combatant i in combatants)
         {
-            resultsLogText.text += i.name + " won: \t" + Math.Round(i.wins / (double)combatCount * 100, 2) + "%\n";
+            resultsLogText.text += i.name + " won: \t" + Math.Round(i.wins / (double)combatCount * 100, 5) + "%\n";
         }
     }
 
