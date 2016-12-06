@@ -9,8 +9,8 @@ public class Combatant {
     public bool hasBonus = false;
     public string name { get; internal set; }
     public bool isDead { get; internal set; }
+    public int wins { get; internal set; }
 
-    int wins;
     Dictionary<int, WinRound> winRounds = new Dictionary<int, WinRound>();
     Dictionary<string, WinHealth> winHealths = new Dictionary<string, WinHealth>();
 

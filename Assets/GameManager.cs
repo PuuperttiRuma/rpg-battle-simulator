@@ -1,8 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections;
-using UnityEngine.UI;
-using System;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -24,14 +24,14 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         characterCreator = GetComponent<CharacterCreator>();
-        resultsManager = new ResultsManager(resultsLogText);
+        //resultsManager = new ResultsManager(resultsLogText, combatants, roundNumber);
         debugCombatants();
     }
 
     private void debugCombatants()
     {
-        combatants.Add(new Combatant("Annie", 8, 2, 2, 6, 0, 0));
-        combatants.Add(new Combatant("Belle", 8, 2, 4, 4, 0, 0));
+        combatants.Add(new Combatant("Annie", 8, 2, 2, 4, 0, 0));
+        combatants.Add(new Combatant("Belle", 8, 2, 2, 4, 0, 0));
         activeCombatant = combatants[0];
         showStats();
     }
@@ -52,12 +52,12 @@ public class GameManager : MonoBehaviour
         showStats();
     }
 
-    void setNextCombatant()
+    void setNextCombatant(bool printToCombatLog)
     {
         int i = combatants.IndexOf(activeCombatant);
         if (i == 0)
         {
-            combatLogText.text += "ROUND " + roundNumber + "!\n";
+            if (printToCombatLog) combatLogText.text += "ROUND " + roundNumber + "!\n";
         }
 
         if (i + 1 < combatants.Count)
@@ -81,7 +81,7 @@ public class GameManager : MonoBehaviour
     //TODO defender käyttää bonuksen vain jos on tulossa osuma
     public void doNextTurn(bool printToCombatLog)
     {
-        setNextCombatant();
+        setNextCombatant(printToCombatLog);
         if (activeCombatant.attackTarget == null)
         {
             activeCombatant.attackTarget = nextCombatant;
@@ -101,20 +101,46 @@ public class GameManager : MonoBehaviour
         activeCombatant = nextCombatant;
     }
 
+    public void doNextRound(bool printToCombatLog)
+    {
+        int roundNumberNow = roundNumber;
+        while (roundNumber == roundNumberNow)
+        {
+            doNextTurn(printToCombatLog);
+        }
+    }
+
+    public void doNextCombat()
+    {
+        int combatCountNow = combatCount;
+        while (combatCountNow == combatCount)
+        {
+            doNextRound(false);
+        }
+    }
+
+    /*
+    public IEnumerator doCombats()
+    {
+        while(buttonDown){
+            yield return null;
+        }
+    } */
+
     void endCombat(Combatant winner)
     {
         //Mark down the results
+        combatCount++;
         winner.win(combatCount);
+        showResults();
 
         //Reset combatants and turn counters etc.
-        combatCount++;
         roundNumber = 0;
         nextCombatant = combatants[0];
         foreach (Combatant combatant in combatants)
         {
             combatant.resetHealth();
         }
-
     }
 
     void printCombatLog(String attackerName, String defenderName, int toHit, int defence, String hitEffects)
@@ -126,15 +152,6 @@ public class GameManager : MonoBehaviour
         scrollDownLog();
     }
     
-    public void doNextRound(bool printToCombatLog)
-    {
-        int roundNumberNow = roundNumber;
-        while (roundNumber == roundNumberNow)
-        {
-            doNextTurn(printToCombatLog);
-        }
-    }
-
     private string effectuateAttack(int rollResult, Combatant attacker, Combatant defender)
     {
 
@@ -170,6 +187,16 @@ public class GameManager : MonoBehaviour
         foreach (Combatant i in combatants)
         {
             statsText.text += i.printStats() + "\n";
+        }
+    }
+
+    void showResults()
+    {
+        resultsLogText.text = "Results:\n";
+        resultsLogText.text += "Battles fought: " + combatCount +"\n";
+        foreach (Combatant i in combatants)
+        {
+            resultsLogText.text += i.name + " won: \t" + Math.Round(i.wins / (double)combatCount * 100, 2) + "%\n";
         }
     }
 

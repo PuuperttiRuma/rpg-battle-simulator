@@ -6,23 +6,20 @@ using UnityEngine.UI;
 public class ResultsManager
 {
     Text textOutput;
+    List<Combatant> combatants;
+    int roundNumber;
 
-    public ResultsManager(Text textWindow)
+    public ResultsManager(Text textWindow, List<Combatant> combatants, int roundNumber)
     {
         textOutput = textWindow;
-    }
+        this.combatants = combatants;
 
-    /*
-    public void addResult(string winner, int round, string health)
-    {
-
-        winners.Add(new Winner(winner, round, health));
     }
 
     void showResults()
     {
         textOutput.text = "";
-        textOutput.text += "Battles fought: " + results.Count;
+        textOutput.text += "Battles fought: " + roundNumber;
     }
 
     int sumOfArray(int[] array)
@@ -33,7 +30,6 @@ public class ResultsManager
             sum += array[i];
         }
         return sum;
-    }
-    */
+    }    
 
 }
