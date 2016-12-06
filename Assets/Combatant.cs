@@ -2,8 +2,10 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
-public class Combatant {
+public class Combatant
+{
 
     public Combatant attackTarget;
     public bool hasBonus = false;
@@ -11,8 +13,8 @@ public class Combatant {
     public bool isDead { get; internal set; }
     public int wins { get; internal set; }
 
-    Dictionary<int, WinRound> winRounds = new Dictionary<int, WinRound>();
-    Dictionary<string, WinHealth> winHealths = new Dictionary<string, WinHealth>();
+    Dictionary<int, int> winRounds = new Dictionary<int, int>();
+    Dictionary<string, int> winHealths = new Dictionary<string, int>();
 
     int[] stress;
     int[] consequences;
@@ -94,7 +96,7 @@ public class Combatant {
         {
             for (int s = 0; s < stress.Length; s++)
             {
-                if (damage == stress[s]+consequences[c])
+                if (damage == stress[s] + consequences[c])
                 {
                     output += name + " soaks the damage with " + stress[s] + " stress and " + consequences[c] + " consequence.\n";
                     stress[s] = 0;
@@ -125,7 +127,7 @@ public class Combatant {
     internal void resetHealth()
     {
         populateStress(stress.Length);
-        populateConseqs((consequences.Length-1)*2); //DEBUG: pieleeen!
+        populateConseqs((consequences.Length - 1) * 2); //DEBUG: pieleeen!
         isDead = false;
     }
 
@@ -137,21 +139,21 @@ public class Combatant {
         //Update winning round numbers
         if (winRounds.ContainsKey(round))
         {
-            winRounds[round].count++;
+            winRounds[round]++;
         }
         else
         {
-            winRounds.Add(round, new WinRound(round));
+            winRounds.Add(round, 1);
         }
 
         //Update winning health stats
         if (winHealths.ContainsKey(printConsequences()))
         {
-            winHealths[printConsequences()].count++;
+            winHealths[printConsequences()]++;
         }
         else
         {
-            winHealths.Add(printConsequences(), new WinHealth(printConsequences()));
+            winHealths.Add(printConsequences(), 1);
         }
 
     }
@@ -172,7 +174,7 @@ public class Combatant {
 
     void populateConseqs(int length)
     {
-        consequences = new int[length/2+1];
+        consequences = new int[length / 2 + 1];
         for (int i = 0; i < consequences.Length; i++)
         {
             consequences[i] = i * 2;
@@ -181,7 +183,7 @@ public class Combatant {
 
     public String printStats()
     {
-        string stats = name + " \t\t " + fightAttribute  + " \t " + fightSkill + " \t " + printStress()
+        string stats = name + " \t\t " + fightAttribute + " \t " + fightSkill + " \t " + printStress()
             + " \t\t " + printConsequences() + " \t\t\t " + attackBonus + " \t " + defenceBonus + " \t " + armorValue + " \t " + weaponDamage;
         return stats;
     }
@@ -218,6 +220,29 @@ public class Combatant {
             }
         }
         return output;
+    }
+
+    internal string printResults()
+    {
+        string result = "";
+        var list = winRounds.Keys.ToList();
+        list.Sort();
+
+        result += name + " won on rounds:\n";
+        foreach (var key in list)
+        {
+            result += key + ": " + Math.Round(winRounds[key] / (double)wins * 100, 2) + "%, (" + winRounds[key] + ")\n";
+        }       
+
+        var list2 = winHealths.Keys.ToList();
+        list2.Sort();
+
+        result += name + " won with health:\n";
+        foreach (var key2 in list2)
+        {
+            result += key2 + ": " + Math.Round(winHealths[key2] / (double)wins * 100, 2) + "%, (" + winHealths[key2] + ")\n";
+        }
+        return result;
     }
 
     //##################

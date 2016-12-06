@@ -16,15 +16,12 @@ public class GameManager : MonoBehaviour
 
     List<Combatant> combatants = new List<Combatant>();
     CharacterCreator characterCreator;
-    ResultsManager resultsManager;
     Combatant activeCombatant;
     Combatant nextCombatant;
-    int roundNumber = 1;
+    int roundNumber = 0;
     int combatCount = 0;
     bool autoCombatToggle = false;
-    int ACIncrement = 1;
-
-    float debugtimer;
+    int ACIncrement = 300;
 
     void Awake()
     {
@@ -62,6 +59,7 @@ public class GameManager : MonoBehaviour
         int i = combatants.IndexOf(activeCombatant);
         if (i == 0)
         {
+            roundNumber++;
             if (printToCombatLog) combatLogText.text += "ROUND " + roundNumber + "!\n";
         }
 
@@ -72,7 +70,6 @@ public class GameManager : MonoBehaviour
         else
         {
             nextCombatant = combatants[0];
-            roundNumber++;
         }
     }
 
@@ -86,7 +83,7 @@ public class GameManager : MonoBehaviour
     //TODO defender käyttää bonuksen vain jos on tulossa osuma
     public void doNextTurn(bool printToCombatLog)
     {
-        setNextCombatant(printToCombatLog);
+        setNextCombatant(printToCombatLog); //Tämä muuttaa round numberin ennenkuin round oikeasti ohi!
         if (activeCombatant.attackTarget == null)
         {
             activeCombatant.attackTarget = nextCombatant;
@@ -122,6 +119,7 @@ public class GameManager : MonoBehaviour
         {
             doNextRound(false);
         }
+        showResults();
     }
 
     public void do100Combat()
@@ -135,7 +133,6 @@ public class GameManager : MonoBehaviour
             }
         }
         showResults();
-
     }
 
     public void autoResolveCombats()
@@ -156,16 +153,14 @@ public class GameManager : MonoBehaviour
 
     IEnumerator autoCombat()
     {
-        //float debugtimer = 0;
-        while(autoCombatToggle && debugtimer < 2)
+
+        while(autoCombatToggle)
         {
             for (int i = 0; i < ACIncrement; i++)
             {
                 doNextCombat();
             }            
             showResults();
-            //calculator++;
-            //debugtimer += Time.deltaTime;
             yield return null;
         }
         
@@ -194,7 +189,7 @@ public class GameManager : MonoBehaviour
     {
         //Mark down the results
         combatCount++;
-        winner.win(combatCount);
+        winner.win(roundNumber);
         if (printToCombatLog) showResults();
 
         //Reset combatants and turn counters etc.
@@ -259,7 +254,12 @@ public class GameManager : MonoBehaviour
         resultsLogText.text += "Battles fought: " + combatCount +"\n";
         foreach (Combatant i in combatants)
         {
-            resultsLogText.text += i.name + " won: \t" + Math.Round(i.wins / (double)combatCount * 100, 5) + "%\n";
+            resultsLogText.text += i.name + " won: \t" + Math.Round(i.wins / (double)combatCount * 100, 5) + "%, (" + i.wins + ")\n";
+        }
+        combatLogText.text = "";
+        foreach (Combatant i in combatants)
+        {
+            combatLogText.text += i.printResults();
         }
     }
 

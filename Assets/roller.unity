@@ -1590,7 +1590,7 @@ RectTransform:
   m_RootOrder: 3
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 40, y: 19.5}
+  m_AnchoredPosition: {x: 40, y: 15}
   m_SizeDelta: {x: 133, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &622707425
@@ -1711,7 +1711,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 4, y: 0}
   m_SizeDelta: {x: -8, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &639661000
@@ -2566,7 +2566,8 @@ MonoBehaviour:
   statsText: {fileID: 1372919624}
   popupMenu: {fileID: 1374162460}
   logScroll: {fileID: 1138751085}
-  autoCombatButton: {fileID: 0}
+  autoCombatButtonText: {fileID: 1413998436}
+  AutoCombatIncrements: {fileID: 0}
 --- !u!114 &862192528
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3312,8 +3313,8 @@ RectTransform:
   m_RootOrder: 4
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -98.5, y: -70.5}
-  m_SizeDelta: {x: 122, y: 30}
+  m_AnchoredPosition: {x: -99, y: -70.5}
+  m_SizeDelta: {x: 123, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1118952179
 MonoBehaviour:
