@@ -162,10 +162,11 @@ public class GameManager : MonoBehaviour
         {
             foreach (Combatant i in combatants)
             {
-
+                file.Write("Name\t At\t Sk\t Stress\t Conseqs\t A+\t D+\t AV\t W\t\r\n");
                 file.Write(i.printStats().Replace("\n","\r\n"));
-                file.Write("\r\nBattles fought: " + combatCount + "\r\n");
+                file.Write("\r\nBattles fought:\t" + combatCount + "\r\n");
                 file.Write(i.printResults(combatCount).Replace("\n", "\r\n"));
+                file.Write("\r\n");
             }
 
         }

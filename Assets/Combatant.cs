@@ -183,8 +183,8 @@ public class Combatant
 
     public String printStats()
     {
-        string stats = name + " \t\t " + fightAttribute + " \t " + fightSkill + " \t " + printStress()
-            + " \t\t " + printConsequences() + " \t\t\t " + attackBonus + " \t " + defenceBonus + " \t " + armorValue + " \t " + weaponDamage;
+        string stats = name + " \t" + fightAttribute + " \t" + fightSkill + " \t" + printStress()
+            + " \t" + printConsequences() + " \t" + attackBonus + " \t" + defenceBonus + " \t" + armorValue + " \t" + weaponDamage;
         return stats;
     }
 
@@ -199,7 +199,7 @@ public class Combatant
             }
             else
             {
-                output += "[  ]";
+                output += "[ ]";
             }
         }
         return output;
@@ -226,14 +226,14 @@ public class Combatant
     {
         string result = "";
         
-        result += name + " won: \t" + Math.Round(wins / (double)combatCount * 100, 5) + "% \t(" + wins + ")\n";
+        result += name + " won: \t" + wins + " \t" + Math.Round(wins / (double)combatCount * 100, 5) + "%\n";
 
         var list = winRounds.Keys.ToList();
         list.Sort();
         result += name + " won on rounds:\n";
         foreach (var key in list)
         {
-            result += key + ": \t" + Math.Round(winRounds[key] / (double)wins * 100, 2) + "% \t(" + winRounds[key] + ")\n";
+            result += key + ": \t" + winRounds[key]+ " \t" + Math.Round(winRounds[key] / (double)wins * 100, 2) + "%\n";
         }       
 
         var list2 = winHealths.Keys.ToList();
@@ -241,33 +241,8 @@ public class Combatant
         result += name + " won with health:\n";
         foreach (var key2 in list2)
         {
-            result += key2 + ": \t" + Math.Round(winHealths[key2] / (double)wins * 100, 2) + "% \t(" + winHealths[key2] + ")\n";
+            result += key2 + ":\t" + winHealths[key2] + " \t" + Math.Round(winHealths[key2] / (double)wins * 100, 2) + "%\n";
         }
         return result;
-    }
-
-    //##################
-    //# RESULT CLASSES #
-    //##################
-    class WinRound
-    {
-        int round;
-        internal int count;
-
-        public WinRound(int round)
-        {
-            this.round = round;
-        }
-    }
-
-    class WinHealth
-    {
-        string health;
-        internal int count;
-
-        public WinHealth(string health)
-        {
-            this.health = health;
-        }
     }
 }
