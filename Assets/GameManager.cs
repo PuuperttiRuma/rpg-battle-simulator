@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviour
     int roundNumber = 0;
     int combatCount = 0;
     bool autoCombatToggle = false;
-    int ACIncrement = 300;
+    int ACIncrement = 100;
 
     void Awake()
     {
@@ -151,6 +151,26 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void writeResultsToFile()
+    {
+        String filename = "";
+        foreach (Combatant i in combatants)
+        {
+            filename += i.name;
+        }
+        using (System.IO.StreamWriter file = new System.IO.StreamWriter(@filename + ".txt", true)) // "D:\Sälää\ropejuttuja\" + 
+        {
+            foreach (Combatant i in combatants)
+            {
+
+                file.Write(i.printStats().Replace("\n","\r\n"));
+                file.Write("\r\nBattles fought: " + combatCount + "\r\n");
+                file.Write(i.printResults(combatCount).Replace("\n", "\r\n"));
+            }
+
+        }
+    }
+
     IEnumerator autoCombat()
     {
 
@@ -171,7 +191,7 @@ public class GameManager : MonoBehaviour
         int value;
         if (Int32.TryParse(AutoCombatIncrements.text, out value))
         {
-            if (value >= 300) value = 300;
+            if (value >= 500) value = 500;
             ACIncrement = value;
             //warningText.text = "";
             //createButton.interactable = true;
@@ -200,6 +220,8 @@ public class GameManager : MonoBehaviour
             combatant.resetHealth();
         }
     }
+
+
 
     void printCombatLog(String attackerName, String defenderName, int toHit, int defence, String hitEffects)
     {
@@ -250,18 +272,17 @@ public class GameManager : MonoBehaviour
 
     void showResults()
     {
-        resultsLogText.text = "Results:\n";
-        resultsLogText.text += "Battles fought: " + combatCount +"\n";
+        combatLogText.text = "Results:\n";
+
+        combatLogText.text += "Battles fought: " + combatCount + "\n";
+
         foreach (Combatant i in combatants)
         {
-            resultsLogText.text += i.name + " won: \t" + Math.Round(i.wins / (double)combatCount * 100, 5) + "%, (" + i.wins + ")\n";
-        }
-        combatLogText.text = "";
-        foreach (Combatant i in combatants)
-        {
-            combatLogText.text += i.printResults();
+            combatLogText.text += i.printResults(combatCount);            
         }
     }
+
+
 
     /*Debugging method, not in use anymore
     public void rollDie(int amount)

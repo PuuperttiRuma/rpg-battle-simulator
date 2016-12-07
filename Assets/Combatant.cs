@@ -127,7 +127,7 @@ public class Combatant
     internal void resetHealth()
     {
         populateStress(stress.Length);
-        populateConseqs((consequences.Length - 1) * 2); //DEBUG: pieleeen!
+        populateConseqs((consequences.Length - 1) * 2);
         isDead = false;
     }
 
@@ -222,25 +222,26 @@ public class Combatant
         return output;
     }
 
-    internal string printResults()
+    internal string printResults(int combatCount)
     {
         string result = "";
+        
+        result += name + " won: \t" + Math.Round(wins / (double)combatCount * 100, 5) + "% \t(" + wins + ")\n";
+
         var list = winRounds.Keys.ToList();
         list.Sort();
-
         result += name + " won on rounds:\n";
         foreach (var key in list)
         {
-            result += key + ": " + Math.Round(winRounds[key] / (double)wins * 100, 2) + "%, (" + winRounds[key] + ")\n";
+            result += key + ": \t" + Math.Round(winRounds[key] / (double)wins * 100, 2) + "% \t(" + winRounds[key] + ")\n";
         }       
 
         var list2 = winHealths.Keys.ToList();
         list2.Sort();
-
         result += name + " won with health:\n";
         foreach (var key2 in list2)
         {
-            result += key2 + ": " + Math.Round(winHealths[key2] / (double)wins * 100, 2) + "%, (" + winHealths[key2] + ")\n";
+            result += key2 + ": \t" + Math.Round(winHealths[key2] / (double)wins * 100, 2) + "% \t(" + winHealths[key2] + ")\n";
         }
         return result;
     }
