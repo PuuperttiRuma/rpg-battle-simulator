@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
     Combatant nextCombatant;
     int roundNumber = 0;
     int combatCount = 0;
+    int roundStartIndex = 0;
     bool autoCombatToggle = false;
     int ACIncrement = 100;
 
@@ -57,12 +58,11 @@ public class GameManager : MonoBehaviour
     void setNextCombatant(bool printToCombatLog)
     {
         int i = combatants.IndexOf(activeCombatant);
-        if (i == 0)
+        if (i == roundStartIndex)
         {
             roundNumber++;
             if (printToCombatLog) combatLogText.text += "ROUND " + roundNumber + "!\n";
         }
-
         if (i + 1 < combatants.Count)
         {
             nextCombatant = combatants[i + 1];
@@ -73,7 +73,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void scrollDownLog()
+
+public void scrollDownLog()
     {
         Canvas.ForceUpdateCanvases();
         logScroll.verticalNormalizedPosition = 0.0f;
@@ -83,7 +84,7 @@ public class GameManager : MonoBehaviour
     //TODO defender käyttää bonuksen vain jos on tulossa osuma
     public void doNextTurn(bool printToCombatLog)
     {
-        setNextCombatant(printToCombatLog); //Tämä muuttaa round numberin ennenkuin round oikeasti ohi!
+        setNextCombatant(printToCombatLog);
         if (activeCombatant.attackTarget == null)
         {
             activeCombatant.attackTarget = nextCombatant;
@@ -105,11 +106,10 @@ public class GameManager : MonoBehaviour
 
     public void doNextRound(bool printToCombatLog)
     {
-        int roundNumberNow = roundNumber;
-        while (roundNumber == roundNumberNow)
+        do
         {
             doNextTurn(printToCombatLog);
-        }
+        } while (combatants.IndexOf(activeCombatant) != roundStartIndex);
     }
 
     public void doNextCombat()
@@ -215,7 +215,8 @@ public class GameManager : MonoBehaviour
 
         //Reset combatants and turn counters etc.
         roundNumber = 0;
-        nextCombatant = combatants[0];
+        roundStartIndex = combatCount % 2;
+        nextCombatant = combatants[roundStartIndex];
         foreach (Combatant combatant in combatants)
         {
             combatant.resetHealth();
