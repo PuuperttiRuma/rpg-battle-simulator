@@ -8,7 +8,8 @@ public class Combatant
 {
 
     public Combatant attackTarget;
-    public bool hasBonus = false;
+    public bool hasBoost = false;
+    public bool gotBoostAsAttacker = false;
     public string name { get; internal set; }
     public bool isDead { get; internal set; }
     public int wins { get; internal set; }
@@ -56,11 +57,6 @@ public class Combatant
         int toHit = 0;
         toHit += Roller.rollPool(fightAttribute, 6, 5);
         toHit += Roller.rollPool(fightSkill, 6, 3);
-        if (hasBonus)
-        {
-            toHit += 2;
-            hasBonus = false;
-        }
         toHit += attackBonus;
         return toHit;
     }
@@ -70,11 +66,6 @@ public class Combatant
         int defence = 0;
         defence += Roller.rollPool(fightAttribute, 6, 5);
         defence += Roller.rollPool(fightSkill, 6, 3);
-        if (hasBonus)
-        {
-            defence += 2;
-            hasBonus = false;
-        }
         defence += defenceBonus;
         return defence;
     }

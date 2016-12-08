@@ -92,16 +92,69 @@ public void scrollDownLog()
         Combatant attacker = activeCombatant;
         Combatant defender = activeCombatant.attackTarget;
         int toHit = attacker.attack();
-        int defence = defender.defend();
+        int defence = defender.defend();        
 
-        attacker.hasBonus = false;
-        defender.hasBonus = false;
+
 
         String hitEffects = effectuateAttack(toHit - defence, attacker, defender);
         if (defender.isDead) endCombat(attacker, printToCombatLog);
         if (printToCombatLog) printCombatLog(attacker.name, defender.name, toHit, defence, hitEffects);        
 
         activeCombatant = nextCombatant;
+    }
+
+    private string effectuateAttack(int rollResult, Combatant attacker, Combatant defender)
+    {
+        String boost = "";
+        if (attacker.gotBoostAsAttacker && attacker.hasBoost)
+        {
+            boost = attacker.name + " uses boost!\n";
+            rollResult += 2;
+            attacker.hasBoost = false;
+        } else if (attacker.hasBoost && rollResult >= -2)
+        {
+            boost = attacker.name + " uses boost!\n";
+            rollResult += 2;
+            attacker.hasBoost = false;
+        }
+        if (defender.hasBoost && !defender.gotBoostAsAttacker)
+        {
+            boost = defender.name + " uses boost!\n";
+            rollResult += -2;
+            defender.hasBoost = false;
+        } else if (defender.hasBoost && rollResult >= 0)
+        {
+            boost = defender.name + " uses boost!\n";
+            rollResult += -2;
+            defender.hasBoost = false;
+        }
+
+
+        int damage = attacker.damage(rollResult);
+        if (rollResult < -2)
+        {
+            defender.hasBoost = true;
+            defender.gotBoostAsAttacker = false;
+            return boost + defender.name + " defends with such style that she gets a boost!\n";
+        }
+        else if (rollResult < 0)
+        {
+            return boost + defender.name + " defends.\n";
+        }
+        else if (rollResult == 0)
+        {
+            attacker.hasBoost = true;
+            attacker.gotBoostAsAttacker = true;
+            return boost + defender.name + " succeeds in her defence, but just barely. " + attacker.name + " gets a boost!\n";
+        }
+        else if (rollResult > 2)
+        {
+            return boost + "Beautiful hit! " + attacker.name + " hits with style and graze and deals " + damage + " shifts of damage to " + defender.name + "!\n" + defender.soak(damage);
+        }
+        else
+        {
+            return boost + "Hit! " + attacker.name + " hits and deals " + damage + " shifts of damage to " + defender.name + "!\n" + defender.soak(damage);
+        }
     }
 
     public void doNextRound(bool printToCombatLog)
@@ -222,9 +275,6 @@ public void scrollDownLog()
             combatant.resetHealth();
         }
     }
-
-
-
     void printCombatLog(String attackerName, String defenderName, int toHit, int defence, String hitEffects)
     {
         combatLogText.text += attackerName + " rolls " + toHit + " for attack.\n";
@@ -232,35 +282,6 @@ public void scrollDownLog()
         combatLogText.text += hitEffects;
         showStats();
         scrollDownLog();
-    }
-    
-    private string effectuateAttack(int rollResult, Combatant attacker, Combatant defender)
-    {
-
-        int damage = attacker.damage(rollResult);
-
-        if (rollResult < -2)
-        {
-            defender.hasBonus = true;
-            return defender.name + " defends with such style that she gets a boost!\n";
-        }
-        else if (rollResult < 0)
-        {
-            return defender.name + " defends.\n";
-        }
-        else if (rollResult == 0)
-        {
-            attacker.hasBonus = true;
-            return defender.name + " succeeds in her defence, but just barely. " + attacker.name + " gets a boost!\n";
-        }
-        else if (rollResult > 2)
-        {            
-            return "Beautiful hit! " + attacker.name + " hits with style and graze and deals " + damage + " shifts of damage to " + defender.name + "!\n" + defender.soak(damage);
-        }
-        else
-        {
-            return "Hit! " + attacker.name + " hits and deals " + damage + " shifts of damage to " + defender.name + "!\n" + defender.soak(damage);
-        }
     }
 
     void showStats()
