@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour
     {
         characterCreator = GetComponent<CharacterCreator>();
         //resultsManager = new ResultsManager(resultsLogText, combatants, roundNumber);
-        debugCombatants();
+        //debugCombatants();
     }
 
     private void debugCombatants()
@@ -245,7 +245,7 @@ public void scrollDownLog()
         int value;
         if (Int32.TryParse(AutoCombatIncrements.text, out value))
         {
-            if (value >= 500) value = 500;
+            if (value >= 2000) value = 2000;
             ACIncrement = value;
             //warningText.text = "";
             //createButton.interactable = true;
