@@ -13,8 +13,6 @@ public class GameManager : MonoBehaviour
     public ScrollRect logScroll;
     public Text autoCombatButtonText;
     public InputField AutoCombatIncrements;
-    public Toggle weaponsAreDice;
-
 
     List<Combatant> combatants = new List<Combatant>();
     CharacterCreator characterCreator;
@@ -23,9 +21,8 @@ public class GameManager : MonoBehaviour
     int roundNumber = 0;
     int combatCount = 0;
     int roundStartIndex = 0;
-    bool autoCombatToggle = false;    
+    bool autoCombatToggle = false;
     int ACIncrement = 100;
-    
 
     void Awake()
     {
@@ -133,7 +130,7 @@ public void scrollDownLog()
         }
 
 
-        int damage = attacker.damage(rollResult, weaponsAreDice.isOn);
+        int damage = attacker.damage(rollResult);
         if (rollResult < -2)
         {
             defender.hasBoost = true;
@@ -248,7 +245,7 @@ public void scrollDownLog()
         int value;
         if (Int32.TryParse(AutoCombatIncrements.text, out value))
         {
-            if (value >= 2000) value = 2000;
+            if (value >= 2500) value = 2500;
             ACIncrement = value;
             //warningText.text = "";
             //createButton.interactable = true;

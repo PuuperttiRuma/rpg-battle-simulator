@@ -248,7 +248,11 @@ public void scrollDownLog()
         int value;
         if (Int32.TryParse(AutoCombatIncrements.text, out value))
         {
+<<<<<<< HEAD
             if (value >= 2000) value = 2000;
+=======
+            if (value >= 2500) value = 2500;
+>>>>>>> 710fa6ca4a7892809e16a8323bad287b60c30a83
             ACIncrement = value;
             //warningText.text = "";
             //createButton.interactable = true;
