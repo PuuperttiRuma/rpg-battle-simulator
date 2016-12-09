@@ -30,7 +30,7 @@ public class Combatant
     {
         name = creator.combatantNameField.text;
         populateStress((int)Math.Round(creator.stressSlider.value));
-        populateConseqs((int)Math.Round(creator.consequencesSlider.value));
+        populateConseqs((int)Math.Round(creator.consequencesSlider.value)*2);
         fightAttribute = (int)Math.Round(creator.fightAttributeSlider.value);
         fightSkill = (int)Math.Round(creator.fightSkillSlider.value); ;
         Int32.TryParse(creator.attackBonusField.text, out attackBonus);
