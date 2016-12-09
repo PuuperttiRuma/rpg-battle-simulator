@@ -70,6 +70,15 @@ public class Combatant
         return defence;
     }
 
+    public int damage(int rawdamage, bool weaponsAreDice)
+    {
+        if (weaponsAreDice)
+        {
+            return rawdamage + Roller.rollPool(weaponDamage, 6, 4);
+        }
+        return rawdamage + weaponDamage;
+    }
+
     public String soak(int damage)
     {
         String output = "";
@@ -147,11 +156,6 @@ public class Combatant
             winHealths.Add(printConsequences(), 1);
         }
 
-    }
-
-    public int damage(int rawdamage)
-    {
-        return rawdamage + weaponDamage;
     }
 
     void populateStress(int length)
