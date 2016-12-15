@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     public ScrollRect logScroll;
     public Text autoCombatButtonText;
     public InputField AutoCombatIncrements;
-    public Toggle weaponsAreDice;
+    public Toggle WeaponsAreDice;
 
 
     List<Combatant> combatants = new List<Combatant>();
@@ -31,13 +31,19 @@ public class GameManager : MonoBehaviour
     {
         characterCreator = GetComponent<CharacterCreator>();
         //resultsManager = new ResultsManager(resultsLogText, combatants, roundNumber);
-        //debugCombatants();
+        debugCombatants();
     }
 
     private void debugCombatants()
     {
         combatants.Add(new Combatant("Annie", 8, 2, 2, 4, 0, 0));
-        combatants.Add(new Combatant("Belle", 8, 2, 2, 4, 0, 0));
+        combatants.Add(new Combatant("Xiani", 8, 2, 0, 0, 0, 0));
+        combatants.Add(new Combatant("Ygrid", 8, 2, 0, 0, 0, 0));
+        for (int i = 0; i < combatants.Count; i++)
+        {
+            if (i == 0) combatants[i].attackTarget = combatants[i + 1];
+            else combatants[i].attackTarget = combatants[0];
+        }
         activeCombatant = combatants[0];
         showStats();
     }
@@ -52,28 +58,43 @@ public class GameManager : MonoBehaviour
 
     public void disablePopupMenu()
     {
-        combatants.Add(new Combatant(characterCreator));
+        Combatant newCombatant = new Combatant(characterCreator);
+        combatants.Add(newCombatant);
+        if (combatants.Count > 1)
+        {
+            for (int i = 0; i < combatants.Count; i++)
+            {
+                if (i == 0) combatants[i].attackTarget = combatants[i + 1];
+                else combatants[i].attackTarget = combatants[0];
+            }
+        }
         activeCombatant = combatants[0];
         popupMenu.SetActive(false);
         showStats();
     }
 
-    void setNextCombatant(bool printToCombatLog)
+    void setNextCombatant()
     {
         int i = combatants.IndexOf(activeCombatant);
-        if (i == roundStartIndex)
+        int failsafe = 0;
+        do
         {
-            roundNumber++;
-            if (printToCombatLog) combatLogText.text += "ROUND " + roundNumber + "!\n";
-        }
-        if (i + 1 < combatants.Count)
-        {
-            nextCombatant = combatants[i + 1];
-        }
-        else
-        {
-            nextCombatant = combatants[0];
-        }
+            if (failsafe == combatants.Count)
+            {
+                Debug.LogError("All combatants are dead!?");
+            }
+            if (i + 1 < combatants.Count)
+            {
+                i++;
+                nextCombatant = combatants[i];
+            }
+            else
+            {
+                i = 0;
+                nextCombatant = combatants[i];
+            }
+            failsafe++;
+        } while (nextCombatant.isDead && failsafe < combatants.Count*2);
     }
 
 
@@ -84,25 +105,36 @@ public void scrollDownLog()
     }
 
     //TODO: varmista että voi hyökätä vain jos väh. 2 taistelijaa!
-    //TODO defender käyttää bonuksen vain jos on tulossa osuma
     public void doNextTurn(bool printToCombatLog)
     {
-        setNextCombatant(printToCombatLog);
+        if (combatants.IndexOf(activeCombatant) == roundStartIndex)
+        {
+            roundNumber++;
+            if (printToCombatLog) combatLogText.text += "ROUND " + roundNumber + "!\n";
+        }
         if (activeCombatant.attackTarget == null)
         {
             activeCombatant.attackTarget = nextCombatant;
         }
         Combatant attacker = activeCombatant;
         Combatant defender = activeCombatant.attackTarget;
-        int toHit = attacker.attack();
-        int defence = defender.defend();        
 
-
-
+        int toHit = attacker.attack(WeaponsAreDice.isOn);
+        int defence = defender.defend(WeaponsAreDice.isOn);        
+        
         String hitEffects = effectuateAttack(toHit - defence, attacker, defender);
-        if (defender.isDead) endCombat(attacker, printToCombatLog);
-        if (printToCombatLog) printCombatLog(attacker.name, defender.name, toHit, defence, hitEffects);        
+        if (printToCombatLog) printCombatLog(attacker.name, defender.name, toHit, defence, hitEffects);
 
+
+        setNextCombatant();
+        if (defender.isDead)
+        {
+            if (nextCombatant.Equals(attacker) || combatants[0].isDead)
+            {
+                endCombat(attacker, printToCombatLog);
+            }
+            else attacker.attackTarget = nextCombatant;
+        }            
         activeCombatant = nextCombatant;
     }
 
@@ -133,7 +165,7 @@ public void scrollDownLog()
         }
 
 
-        int damage = attacker.damage(rollResult, weaponsAreDice.isOn);
+        int damage = attacker.damage(rollResult, WeaponsAreDice.isOn);
         if (rollResult < -2)
         {
             defender.hasBoost = true;
@@ -175,7 +207,7 @@ public void scrollDownLog()
         {
             doNextRound(false);
         }
-        showResults();
+        showResults(append : false);
     }
 
     public void do100Combat()
@@ -188,7 +220,7 @@ public void scrollDownLog()
                 doNextRound(false);
             }
         }
-        showResults();
+        showResults(append: false);
     }
 
     public void autoResolveCombats()
@@ -237,7 +269,7 @@ public void scrollDownLog()
             {
                 doNextCombat();
             }            
-            showResults();
+            showResults(append: false);
             yield return null;
         }
         
@@ -267,11 +299,11 @@ public void scrollDownLog()
         //Mark down the results
         combatCount++;
         winner.win(roundNumber);
-        if (printToCombatLog) showResults();
+        if (printToCombatLog) showResults(append : true);
 
         //Reset combatants and turn counters etc.
         roundNumber = 0;
-        roundStartIndex = combatCount % 2;
+        roundStartIndex = combatCount % combatants.Count;
         nextCombatant = combatants[roundStartIndex];
         foreach (Combatant combatant in combatants)
         {
@@ -296,9 +328,10 @@ public void scrollDownLog()
         }
     }
 
-    void showResults()
+    void showResults(bool append)
     {
-        combatLogText.text = "Results:\n";
+        if (append) combatLogText.text += "Results:\n";
+        else combatLogText.text = "Results:\n";
 
         combatLogText.text += "Battles fought: " + combatCount + "\n";
 

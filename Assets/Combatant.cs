@@ -37,7 +37,7 @@ public class Combatant
         Int32.TryParse(creator.defenseBonusField.text, out defenceBonus);
         Int32.TryParse(creator.armorValueField.text, out armorValue);
         Int32.TryParse(creator.weaponDamageField.text, out weaponDamage);
-        isDead = false;
+        this.isDead = false;
     }
 
     public Combatant(string combatantName, int fightAttribute, int fightSkill, int stress, int conseqs, int weaponDamage, int armorValue)
@@ -49,24 +49,38 @@ public class Combatant
         this.fightSkill = fightSkill;
         this.armorValue = armorValue;
         this.weaponDamage = weaponDamage;
-        isDead = false;
+        this.isDead = false;
     }
 
-    public int attack()
+    public int attack(bool weaponsAreDice)
     {
         int toHit = 0;
         toHit += Roller.rollPool(fightAttribute, 6, 5);
         toHit += Roller.rollPool(fightSkill, 6, 3);
-        toHit += attackBonus;
+        if (weaponsAreDice)
+        {
+            toHit += Roller.rollPool(attackBonus, 6, 4);
+        }
+        else
+        {
+            toHit += attackBonus;
+        }
         return toHit;
     }
 
-    public int defend()
+    public int defend(bool weaponsAreDice)
     {
         int defence = 0;
         defence += Roller.rollPool(fightAttribute, 6, 5);
         defence += Roller.rollPool(fightSkill, 6, 3);
-        defence += defenceBonus;
+        if (weaponsAreDice)
+        {
+            defence += Roller.rollPool(defenceBonus, 6, 4);
+        }
+        else
+        {
+            defence += defenceBonus;
+        }
         return defence;
     }
 
