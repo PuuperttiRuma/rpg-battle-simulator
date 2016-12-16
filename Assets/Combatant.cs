@@ -54,6 +54,13 @@ public class Combatant
         this.isDead = false;
     }
 
+    internal void clearResults()
+    {
+        wins = 0;
+        winHealths.Clear();
+        winRounds.Clear();
+    }
+
     public int attack(bool weaponsAreDice)
     {
         int toHit = 0;

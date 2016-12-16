@@ -48,7 +48,7 @@ public class GameManager : MonoBehaviour
         showStats();
     }
 
-    public void CreateCombatant()
+    public void openCharacterCreator()
     {
         characterCreator.updateTexts();
         characterCreator.checkFields();
@@ -57,14 +57,28 @@ public class GameManager : MonoBehaviour
     }
 
     public void RemoveCombatant() {
-        combatants.RemoveAt(combatants.Count - 1);        
+        combatants.RemoveAt(combatants.Count - 1);
+        foreach (Combatant i in combatants)
+        {
+            i.clearResults();
+        }
+        roundNumber = 0;
+        combatCount = 0;
+        setAttackTargets();
         showStats();
     }
 
-    public void disablePopupMenu()
+    public void CreateCharacter()
     {
         Combatant newCombatant = new Combatant(characterCreator);
         combatants.Add(newCombatant);
+        setAttackTargets();
+        popupMenu.SetActive(false);
+        showStats();
+    }
+
+    void setAttackTargets()
+    {
         if (combatants.Count > 1)
         {
             for (int i = 0; i < combatants.Count; i++)
@@ -74,8 +88,6 @@ public class GameManager : MonoBehaviour
             }
         }
         activeCombatant = combatants[0];
-        popupMenu.SetActive(false);
-        showStats();
     }
 
     void setNextCombatant()
