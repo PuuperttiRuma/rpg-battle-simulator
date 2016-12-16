@@ -39,7 +39,7 @@ public class Combatant
         Int32.TryParse(creator.defenseBonusField.text, out defenceBonus);
         Int32.TryParse(creator.armorValueField.text, out armorValue);
         Int32.TryParse(creator.weaponDamageField.text, out weaponDamage);
-        isDead = false;
+        this.isDead = false;
     }
 
     public Combatant(string combatantName, int fightAttribute, int fightSkill, int stress, int conseqs, int weaponDamage, int armorValue)
@@ -59,8 +59,7 @@ public class Combatant
         int toHit = 0;
         toHit += Roller.rollPool(fightAttribute, 6, 5);
         toHit += Roller.rollPool(fightSkill, 6, 3);
-        toHit += Roller.rollPool(npcSkill, 6, 4);
-        toHit += attackBonus;
+<<<<<<< HEAD
         if (weaponsAreDice)
         {
             toHit += Roller.rollPool(attackBonus, 6, 4);
@@ -69,6 +68,10 @@ public class Combatant
         {
             toHit += attackBonus;
         }
+=======
+        toHit += Roller.rollPool(npcSkill, 6, 4);
+        toHit += attackBonus;
+>>>>>>> origin/master
         return toHit;
     }
 
@@ -77,8 +80,7 @@ public class Combatant
         int defence = 0;
         defence += Roller.rollPool(fightAttribute, 6, 5);
         defence += Roller.rollPool(fightSkill, 6, 3);
-        defence += Roller.rollPool(npcSkill, 6, 4);
-        defence += defenceBonus;
+<<<<<<< HEAD
         if (weaponsAreDice)
         {
             defence += Roller.rollPool(defenceBonus, 6, 4);
@@ -87,6 +89,10 @@ public class Combatant
         {
             defence += defenceBonus;
         }
+=======
+        defence += Roller.rollPool(npcSkill, 6, 4);
+        defence += defenceBonus;
+>>>>>>> origin/master
         return defence;
     }
 
