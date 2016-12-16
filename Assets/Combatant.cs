@@ -21,6 +21,7 @@ public class Combatant
     int[] consequences;
     int fightAttribute;
     int fightSkill;
+    int npcSkill;
     int attackBonus;
     int defenceBonus;
     int armorValue;
@@ -32,7 +33,8 @@ public class Combatant
         populateStress((int)Math.Round(creator.stressSlider.value));
         populateConseqs((int)Math.Round(creator.consequencesSlider.value)*2);
         fightAttribute = (int)Math.Round(creator.fightAttributeSlider.value);
-        fightSkill = (int)Math.Round(creator.fightSkillSlider.value); ;
+        fightSkill = (int)Math.Round(creator.fightSkillSlider.value);
+        npcSkill = (int)Math.Round(creator.npcSlider.value);
         Int32.TryParse(creator.attackBonusField.text, out attackBonus);
         Int32.TryParse(creator.defenseBonusField.text, out defenceBonus);
         Int32.TryParse(creator.armorValueField.text, out armorValue);
@@ -57,6 +59,7 @@ public class Combatant
         int toHit = 0;
         toHit += Roller.rollPool(fightAttribute, 6, 5);
         toHit += Roller.rollPool(fightSkill, 6, 3);
+        toHit += Roller.rollPool(npcSkill, 6, 4);
         toHit += attackBonus;
         return toHit;
     }
@@ -66,6 +69,7 @@ public class Combatant
         int defence = 0;
         defence += Roller.rollPool(fightAttribute, 6, 5);
         defence += Roller.rollPool(fightSkill, 6, 3);
+        defence += Roller.rollPool(npcSkill, 6, 4);
         defence += defenceBonus;
         return defence;
     }

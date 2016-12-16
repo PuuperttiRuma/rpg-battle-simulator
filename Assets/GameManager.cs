@@ -50,6 +50,11 @@ public class GameManager : MonoBehaviour
         //Combatant dude = new Combatant("Dude", 3, 4, 8, 2);
     }
 
+    public void RemoveCombatant() {
+        combatants.RemoveAt(combatants.Count - 1);        
+        showStats();
+    }
+
     public void disablePopupMenu()
     {
         combatants.Add(new Combatant(characterCreator));

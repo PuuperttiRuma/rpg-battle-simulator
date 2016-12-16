@@ -11,6 +11,7 @@ public class CharacterCreator : MonoBehaviour {
     public Slider consequencesSlider;
     public Slider fightAttributeSlider;
     public Slider fightSkillSlider;
+    public Slider npcSlider;
     public InputField attackBonusField;
     public InputField defenseBonusField;
     public InputField armorValueField;
@@ -22,6 +23,7 @@ public class CharacterCreator : MonoBehaviour {
     Text conseqsTitle;
     Text attributeTitle;
     Text skillTitle;
+    Text npcTitle;
     List<InputField> fields;
 
     void Awake()
@@ -30,6 +32,7 @@ public class CharacterCreator : MonoBehaviour {
         conseqsTitle = consequencesSlider.GetComponentInChildren<Text>();
         attributeTitle = fightAttributeSlider.GetComponentInChildren<Text>();
         skillTitle = fightSkillSlider.GetComponentInChildren<Text>();
+        npcTitle = npcSlider.GetComponentInChildren<Text>();
         fields = new List<InputField>();
         fields.Add(attackBonusField);
         fields.Add(defenseBonusField);
@@ -45,6 +48,7 @@ public class CharacterCreator : MonoBehaviour {
         conseqsTitle.text = "Conseqs (" + (int)Math.Round(consequencesSlider.value)*2 + "):";
         attributeTitle.text = "Attribute (" + (int)Math.Round(fightAttributeSlider.value) + "):";
         skillTitle.text = "Skill (" + (int)Math.Round(fightSkillSlider.value) + "):";
+        npcTitle.text = "4+ (" + (int)Math.Round(npcSlider.value) + "):";
     }
 
     public void checkFields()
