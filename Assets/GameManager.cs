@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour
     {
         characterCreator = GetComponent<CharacterCreator>();
         //resultsManager = new ResultsManager(resultsLogText, combatants, roundNumber);
-        debugCombatants();
+        //debugCombatants();
     }
 
     private void debugCombatants()
@@ -54,6 +54,11 @@ public class GameManager : MonoBehaviour
         characterCreator.checkFields();
         popupMenu.SetActive(true);
         //Combatant dude = new Combatant("Dude", 3, 4, 8, 2);
+    }
+
+    public void RemoveCombatant() {
+        combatants.RemoveAt(combatants.Count - 1);        
+        showStats();
     }
 
     public void disablePopupMenu()
@@ -98,7 +103,7 @@ public class GameManager : MonoBehaviour
     }
 
 
-public void scrollDownLog()
+    public void scrollDownLog()
     {
         Canvas.ForceUpdateCanvases();
         logScroll.verticalNormalizedPosition = 0.0f;
