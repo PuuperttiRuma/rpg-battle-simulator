@@ -86,8 +86,8 @@ public class GameManager : MonoBehaviour
                 if (i == 0) combatants[i].attackTarget = combatants[i + 1];
                 else combatants[i].attackTarget = combatants[0];
             }
+            activeCombatant = combatants[0];
         }
-        activeCombatant = combatants[0];
     }
 
     void setNextCombatant()
